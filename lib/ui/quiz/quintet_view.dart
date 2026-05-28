@@ -49,6 +49,17 @@ class QuintetView extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              if (label == 'KEEP GOING') ...[
+                ClipOval(
+                  child: Image.asset(
+                    'assets/dum.png',
+                    width: 90,
+                    height: 90,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               Text(
                 'QUINTET COMPLETE',
                 style: GoogleFonts.inter(

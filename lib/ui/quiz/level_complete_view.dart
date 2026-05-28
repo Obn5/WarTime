@@ -85,24 +85,33 @@ class LevelCompleteView extends StatelessWidget {
                 tween: Tween(begin: 0.5, end: 1.0),
                 builder: (_, v, child) =>
                     Transform.scale(scale: v, child: child),
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        rankColor.withValues(alpha: 0.25),
-                        rankColor.withValues(alpha: 0.08),
-                      ],
-                    ),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                        color: rankColor.withValues(alpha: 0.45), width: 2),
-                  ),
-                  child: Icon(rankIcon, color: rankColor, size: 40),
-                ),
+                child: rankLabel == 'KEEP GOING'
+                    ? ClipOval(
+                        child: Image.asset(
+                          'assets/dum.png',
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Container(
+                        width: 90,
+                        height: 90,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              rankColor.withValues(alpha: 0.25),
+                              rankColor.withValues(alpha: 0.08),
+                            ],
+                          ),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                              color: rankColor.withValues(alpha: 0.45), width: 2),
+                        ),
+                        child: Icon(rankIcon, color: rankColor, size: 40),
+                      ),
               ),
               const SizedBox(height: 20),
 
