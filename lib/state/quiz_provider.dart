@@ -78,6 +78,23 @@ class QuizProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addTopic(Topic topic) {
+    if (_quizSet == null) {
+      _quizSet = QuizSet(name: 'My Collection', topics: [topic]);
+    } else {
+      _quizSet = QuizSet(
+        name: _quizSet!.topics.length == 1 &&
+                _quizSet!.name == _quizSet!.topics.first.name
+            ? 'My Collection'
+            : _quizSet!.name,
+        topics: [..._quizSet!.topics, topic],
+      );
+    }
+    _selectedTopic = null;
+    _phase = QuizPhase.idle;
+    notifyListeners();
+  }
+
   void selectTopic(Topic topic) {
     _selectedTopic = topic;
     notifyListeners();

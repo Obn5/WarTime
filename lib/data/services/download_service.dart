@@ -9,110 +9,54 @@ class TopicPack {
   final String name;
   final String emoji;
   final int categoryId;
-  final String difficulty;
-  final int amount;
   final String description;
 
   const TopicPack({
     required this.name,
     required this.emoji,
     required this.categoryId,
-    required this.difficulty,
-    required this.amount,
     required this.description,
   });
 }
 
 class DownloadService {
   static const List<TopicPack> catalog = [
-    TopicPack(
-      name: 'Anime & Manga',
-      emoji: '🎌',
-      categoryId: 31,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Characters, series, and lore from the anime world.',
-    ),
-    TopicPack(
-      name: 'Video Games',
-      emoji: '🎮',
-      categoryId: 15,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Classics, titles, and gaming trivia.',
-    ),
-    TopicPack(
-      name: 'Movies',
-      emoji: '🎬',
-      categoryId: 11,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Hollywood, directors, and iconic scenes.',
-    ),
-    TopicPack(
-      name: 'Science & Nature',
-      emoji: '🔬',
-      categoryId: 17,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Biology, physics, chemistry, and earth sciences.',
-    ),
-    TopicPack(
-      name: 'History',
-      emoji: '🏛️',
-      categoryId: 23,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Ancient civilizations to modern events.',
-    ),
-    TopicPack(
-      name: 'Geography',
-      emoji: '🌍',
-      categoryId: 22,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Countries, capitals, and world landmarks.',
-    ),
-    TopicPack(
-      name: 'Music',
-      emoji: '🎵',
-      categoryId: 12,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Artists, albums, and music history.',
-    ),
-    TopicPack(
-      name: 'Sports',
-      emoji: '⚽',
-      categoryId: 21,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Champions, records, and sports facts.',
-    ),
-    TopicPack(
-      name: 'Computers',
-      emoji: '💻',
-      categoryId: 18,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Tech, programming, and computer science.',
-    ),
-    TopicPack(
-      name: 'Mythology',
-      emoji: '⚡',
-      categoryId: 20,
-      difficulty: 'medium',
-      amount: 30,
-      description: 'Gods, heroes, and ancient legends.',
-    ),
+    // Entertainment
+    TopicPack(name: 'Anime & Manga',       emoji: '🎌', categoryId: 31, description: 'Characters, series, and lore from the anime world.'),
+    TopicPack(name: 'Video Games',         emoji: '🎮', categoryId: 15, description: 'Classics, titles, and gaming trivia.'),
+    TopicPack(name: 'Movies',              emoji: '🎬', categoryId: 11, description: 'Hollywood, directors, and iconic scenes.'),
+    TopicPack(name: 'Television',          emoji: '📺', categoryId: 14, description: 'TV shows, characters, and broadcast history.'),
+    TopicPack(name: 'Music',               emoji: '🎵', categoryId: 12, description: 'Artists, albums, and music history.'),
+    TopicPack(name: 'Cartoon & Animation', emoji: '🎞️', categoryId: 32, description: 'Western cartoons and animated series.'),
+    TopicPack(name: 'Comics',              emoji: '💬', categoryId: 29, description: 'Superheroes, manga, and comic book lore.'),
+    TopicPack(name: 'Board Games',         emoji: '🎲', categoryId: 16, description: 'Strategy, classics, and tabletop trivia.'),
+    TopicPack(name: 'Musicals & Theatre',  emoji: '🎭', categoryId: 13, description: 'Broadway, West End, and stage productions.'),
+    TopicPack(name: 'Books',               emoji: '📚', categoryId: 10, description: 'Literature, authors, and classic novels.'),
+    TopicPack(name: 'Celebrities',         emoji: '⭐', categoryId: 26, description: 'Famous people, pop culture, and stars.'),
+    // Science & Knowledge
+    TopicPack(name: 'General Knowledge',   emoji: '🧠', categoryId:  9, description: 'A wide mix of trivia and fun facts.'),
+    TopicPack(name: 'Science & Nature',    emoji: '🔬', categoryId: 17, description: 'Biology, physics, chemistry, and earth sciences.'),
+    TopicPack(name: 'Computers',           emoji: '💻', categoryId: 18, description: 'Tech, programming, and computer science.'),
+    TopicPack(name: 'Mathematics',         emoji: '📐', categoryId: 19, description: 'Numbers, logic, and mathematical puzzles.'),
+    TopicPack(name: 'Gadgets',             emoji: '📱', categoryId: 30, description: 'Tech gadgets, devices, and inventions.'),
+    // World & Culture
+    TopicPack(name: 'History',             emoji: '🏛️', categoryId: 23, description: 'Ancient civilizations to modern events.'),
+    TopicPack(name: 'Geography',           emoji: '🌍', categoryId: 22, description: 'Countries, capitals, and world landmarks.'),
+    TopicPack(name: 'Mythology',           emoji: '⚡', categoryId: 20, description: 'Gods, heroes, and ancient legends.'),
+    TopicPack(name: 'Politics',            emoji: '🗳️', categoryId: 24, description: 'Governments, elections, and world politics.'),
+    TopicPack(name: 'Art',                 emoji: '🎨', categoryId: 25, description: 'Paintings, artists, and art movements.'),
+    // Sports & Life
+    TopicPack(name: 'Sports',              emoji: '⚽', categoryId: 21, description: 'Champions, records, and sports facts.'),
+    TopicPack(name: 'Animals',             emoji: '🐾', categoryId: 27, description: 'Wildlife, pets, and animal kingdom trivia.'),
+    TopicPack(name: 'Vehicles',            emoji: '🚗', categoryId: 28, description: 'Cars, planes, trains, and transport history.'),
   ];
 
-  static Future<QuizSet?> download(TopicPack pack) async {
+  static Future<Topic?> downloadTopic(TopicPack pack, String difficulty) async {
     final uri = Uri.parse(
       'https://opentdb.com/api.php'
-      '?amount=${pack.amount}'
+      '?amount=30'
       '&category=${pack.categoryId}'
-      '&difficulty=${pack.difficulty}'
+      '&difficulty=$difficulty'
       '&type=multiple',
     );
 
@@ -123,18 +67,26 @@ class DownloadService {
     if ((data['response_code'] as int) != 0) return null;
 
     final results = data['results'] as List;
+    if (results.isEmpty) return null;
+
     final questions = results
         .map((r) => _convertQuestion(r as Map<String, dynamic>))
         .toList();
 
-    final topic = Topic(
-      id: pack.name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '_'),
-      name: pack.name,
+    final diffLabel = _capitalize(difficulty);
+    return Topic(
+      id: '${pack.name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]'), '_')}_$difficulty',
+      name: '${pack.name} · $diffLabel',
       description: pack.description,
-      difficulty: _capitalize(pack.difficulty),
+      difficulty: diffLabel,
       questions: questions,
     );
+  }
 
+  // Keep for backward compat (single-topic QuizSet)
+  static Future<QuizSet?> download(TopicPack pack) async {
+    final topic = await downloadTopic(pack, 'medium');
+    if (topic == null) return null;
     return QuizSet(name: pack.name, topics: [topic]);
   }
 
