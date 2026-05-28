@@ -9,6 +9,7 @@ import '../quiz/quiz_screen.dart';
 import '../shared/pressable.dart';
 import '../shared/theme_dropdown.dart';
 import '../stats/stats_screen.dart';
+import '../store/store_screen.dart';
 import 'topics_screen.dart';
 import 'widgets/import_card.dart';
 import 'widgets/topic_card.dart';
@@ -147,6 +148,72 @@ class HomeScreen extends StatelessWidget {
                     onSample: () => _loadSample(context),
                     hasQuiz: quizSet != null,
                     quizName: quizSet?.name,
+                  ),
+
+                  const SizedBox(height: 12),
+                  Pressable(
+                    onTap: () => Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (_, anim, __) => const StoreScreen(),
+                        transitionsBuilder: (_, anim, __, child) =>
+                            FadeTransition(
+                          opacity: CurvedAnimation(
+                              parent: anim, curve: Curves.easeOut),
+                          child: child,
+                        ),
+                        transitionDuration: const Duration(milliseconds: 250),
+                      ),
+                    ),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: c.cardDark,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: c.border),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: c.primary.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(Icons.download_rounded,
+                                color: c.primary, size: 18),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Download Topics',
+                                  style: GoogleFonts.inter(
+                                    color: c.textPrimary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  'Anime, Games, History, Science & more',
+                                  style: GoogleFonts.inter(
+                                    color: c.textSecondary,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios_rounded,
+                              color: c.textMuted, size: 13),
+                        ],
+                      ),
+                    ),
                   ),
 
                   if (quizSet != null) ...[
