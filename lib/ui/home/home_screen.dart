@@ -5,33 +5,64 @@ import '../../core/app_colors.dart';
 import '../../core/constants.dart';
 import '../../state/quiz_provider.dart';
 import '../../data/services/json_service.dart';
+import '../../data/services/saved_quiz_service.dart';
 import '../quiz/quiz_screen.dart';
 import '../shared/pressable.dart';
 import '../shared/theme_dropdown.dart';
 import '../stats/stats_screen.dart';
-import '../store/store_screen.dart';
 import 'topics_screen.dart';
 import 'widgets/import_card.dart';
 import 'widgets/topic_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  Future<void> _importJson(BuildContext context) async {
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<SavedQuizMeta> _saved = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshSaved();
+  }
+
+  Future<void> _refreshSaved() async {
+    final list = await SavedQuizService.list();
+    if (mounted) setState(() => _saved = list);
+  }
+
+  Future<void> _importJson() async {
     final quizSet = await JsonService.pickFile();
-    if (quizSet != null && context.mounted) {
+    if (quizSet != null && mounted) {
       context.read<QuizProvider>().loadQuizSet(quizSet);
+      await _refreshSaved();
     }
   }
 
-  Future<void> _loadSample(BuildContext context) async {
+  Future<void> _loadSample() async {
     final quizSet = await JsonService.loadSample();
-    if (quizSet != null && context.mounted) {
+    if (quizSet != null && mounted) {
       context.read<QuizProvider>().loadQuizSet(quizSet);
     }
   }
 
-  void _startQuiz(BuildContext context) {
+  Future<void> _loadSaved(SavedQuizMeta meta) async {
+    final quizSet = await JsonService.loadSaved(meta);
+    if (quizSet != null && mounted) {
+      context.read<QuizProvider>().loadQuizSet(quizSet);
+    }
+  }
+
+  Future<void> _deleteSaved(SavedQuizMeta meta) async {
+    await SavedQuizService.delete(meta.filename);
+    await _refreshSaved();
+  }
+
+  void _startQuiz() {
     context.read<QuizProvider>().startQuiz();
     Navigator.push(
       context,
@@ -56,7 +87,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: c.bg,
       body: Column(
         children: [
-          // ── Top nav ─────────────────────────────────────────
+          // ── Top nav ──────────────────────────────────────────
           SafeArea(
             bottom: false,
             child: Padding(
@@ -80,9 +111,7 @@ class HomeScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => const StatsScreen(
-                            isComplete: false,
-                            isStandalone: true,
-                          ),
+                              isComplete: false, isStandalone: true),
                         ),
                       ),
                       child: Container(
@@ -143,79 +172,56 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
 
+                  // ── Import card ─────────────────────────────
                   ImportCard(
-                    onBrowse: () => _importJson(context),
-                    onSample: () => _loadSample(context),
+                    onBrowse: _importJson,
+                    onSample: _loadSample,
                     hasQuiz: quizSet != null,
                     quizName: quizSet?.name,
                   ),
 
-                  const SizedBox(height: 12),
-                  Pressable(
-                    onTap: () => Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (_, anim, __) => const StoreScreen(),
-                        transitionsBuilder: (_, anim, __, child) =>
-                            FadeTransition(
-                          opacity: CurvedAnimation(
-                              parent: anim, curve: Curves.easeOut),
-                          child: child,
+                  // ── Saved quizzes ───────────────────────────
+                  if (_saved.isNotEmpty) ...[
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        Text(
+                          'Saved Quizzes',
+                          style: GoogleFonts.inter(
+                            color: c.textPrimary,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        transitionDuration: const Duration(milliseconds: 250),
-                      ),
-                    ),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 14),
-                      decoration: BoxDecoration(
-                        color: c.cardDark,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: c.border),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: c.primary.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Icon(Icons.download_rounded,
-                                color: c.primary, size: 18),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: c.primary.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Download Topics',
-                                  style: GoogleFonts.inter(
-                                    color: c.textPrimary,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text(
-                                  'Anime, Games, History, Science & more',
-                                  style: GoogleFonts.inter(
-                                    color: c.textSecondary,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                              ],
+                          child: Text(
+                            '${_saved.length}',
+                            style: GoogleFonts.inter(
+                              color: c.primary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios_rounded,
-                              color: c.textMuted, size: 13),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    ..._saved.map((meta) => _SavedQuizRow(
+                          meta: meta,
+                          isActive: quizSet?.name == meta.name,
+                          onLoad: () => _loadSaved(meta),
+                          onDelete: () => _deleteSaved(meta),
+                        )),
+                  ],
 
+                  // ── Topic selector ──────────────────────────
                   if (quizSet != null) ...[
                     const SizedBox(height: 32),
                     Row(
@@ -293,7 +299,7 @@ class HomeScreen extends StatelessWidget {
 
                     if (provider.selectedTopic != null)
                       Pressable(
-                        onTap: () => _startQuiz(context),
+                        onTap: _startQuiz,
                         child: Container(
                           width: double.infinity,
                           height: 52,
@@ -320,7 +326,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                  ] else ...[
+                  ] else if (_saved.isEmpty) ...[
                     const SizedBox(height: 48),
                     Center(
                       child: Column(
@@ -345,6 +351,140 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Saved quiz row ────────────────────────────────────────────
+
+class _SavedQuizRow extends StatelessWidget {
+  final SavedQuizMeta meta;
+  final bool isActive;
+  final VoidCallback onLoad;
+  final VoidCallback onDelete;
+
+  const _SavedQuizRow({
+    required this.meta,
+    required this.isActive,
+    required this.onLoad,
+    required this.onDelete,
+  });
+
+  String _timeAgo(DateTime dt) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inDays >= 1) return '${diff.inDays}d ago';
+    if (diff.inHours >= 1) return '${diff.inHours}h ago';
+    if (diff.inMinutes >= 1) return '${diff.inMinutes}m ago';
+    return 'Just now';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final c = Theme.of(context).extension<AppColors>()!;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Container(
+        decoration: BoxDecoration(
+          color: c.cardDark,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isActive
+                ? c.primary.withValues(alpha: 0.5)
+                : c.border,
+            width: isActive ? 1.5 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            // Load button area
+            Expanded(
+              child: Pressable(
+                onTap: onLoad,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 13),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? c.primary.withValues(alpha: 0.15)
+                              : c.surface,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: isActive
+                                  ? c.primary.withValues(alpha: 0.3)
+                                  : c.border),
+                        ),
+                        child: Icon(
+                          isActive
+                              ? Icons.check_rounded
+                              : Icons.folder_open_rounded,
+                          color: isActive ? c.primary : c.textSecondary,
+                          size: 17,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              meta.name,
+                              style: GoogleFonts.inter(
+                                color: isActive
+                                    ? c.primary
+                                    : c.textPrimary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isActive
+                                  ? 'Currently loaded'
+                                  : 'Saved · ${_timeAgo(meta.savedAt)}',
+                              style: GoogleFonts.inter(
+                                color: isActive
+                                    ? c.primary.withValues(alpha: 0.7)
+                                    : c.textSecondary,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isActive)
+                        Text(
+                          'Load',
+                          style: GoogleFonts.inter(
+                            color: c.primary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Delete button
+            GestureDetector(
+              onTap: onDelete,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Icon(Icons.delete_outline_rounded,
+                    color: c.textMuted, size: 18),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

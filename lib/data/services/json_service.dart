@@ -1,8 +1,9 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants.dart';
 import '../models/quiz_set.dart';
+import 'saved_quiz_service.dart';
 
 class JsonService {
   static QuizSet? parse(String jsonString) {
@@ -27,6 +28,16 @@ class JsonService {
     );
     if (result == null || result.files.single.bytes == null) return null;
     final raw = utf8.decode(result.files.single.bytes!);
+    final quizSet = parse(raw);
+    if (quizSet != null) {
+      await SavedQuizService.save(quizSet.name, raw);
+    }
+    return quizSet;
+  }
+
+  static Future<QuizSet?> loadSaved(SavedQuizMeta meta) async {
+    final raw = await SavedQuizService.readContent(meta.filename);
+    if (raw == null) return null;
     return parse(raw);
   }
 }
