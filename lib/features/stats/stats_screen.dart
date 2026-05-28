@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../providers/quiz_provider.dart';
-import '../theme/app_theme.dart';
+import '../../app/app_theme.dart';
+import '../../app/constants.dart';
+import '../../providers/quiz_provider.dart';
+import 'widgets/achievement_card.dart';
+import 'widgets/stat_card.dart';
 
 class StatsScreen extends StatelessWidget {
   final bool isComplete;
@@ -28,22 +31,6 @@ class StatsScreen extends StatelessWidget {
     return 'Methodical';
   }
 
-  String _achievement(int bestStreak, double accuracy) {
-    if (bestStreak >= 10) return 'Quantum Master';
-    if (bestStreak >= 7) return 'Boson Hunter';
-    if (accuracy >= 0.9) return 'Sharp Mind';
-    if (accuracy >= 0.7) return 'Field Explorer';
-    return 'Curious Learner';
-  }
-
-  String _achievementSub(int bestStreak, double accuracy) {
-    if (bestStreak >= 10) return 'Reached 10-streak perfection.';
-    if (bestStreak >= 7) return 'Identified $bestStreak in a row.';
-    if (accuracy >= 0.9) return '90%+ accuracy maintained.';
-    if (accuracy >= 0.7) return 'Solid understanding of the field.';
-    return 'Every question brings you closer.';
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<QuizProvider>();
@@ -55,7 +42,7 @@ class StatsScreen extends StatelessWidget {
       backgroundColor: AppTheme.bg,
       body: Column(
         children: [
-          // ── Top nav ──────────────────────────────────────
+          // ── Top nav ───────────────────────────────────────
           SafeArea(
             bottom: false,
             child: Padding(
@@ -80,20 +67,16 @@ class StatsScreen extends StatelessWidget {
                   else
                     const SizedBox(width: 32),
                   const SizedBox(width: 12),
-                  Row(
-                    children: [
-                      const Icon(Icons.grid_view_rounded,
-                          color: AppTheme.primary, size: 15),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Fields & Quarks',
-                        style: GoogleFonts.inter(
-                          color: AppTheme.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
+                  const Icon(Icons.grid_view_rounded,
+                      color: AppTheme.primary, size: 15),
+                  const SizedBox(width: 6),
+                  Text(
+                    AppConstants.appName,
+                    style: GoogleFonts.inter(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                   const Spacer(),
                   Container(
@@ -112,12 +95,13 @@ class StatsScreen extends StatelessWidget {
             ),
           ),
 
+          // ── Scrollable content ────────────────────────────
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
               child: Column(
                 children: [
-                  // ── Mission Complete badge ──────────────
+                  // Mission complete badge
                   if (isComplete) ...[
                     const SizedBox(height: 20),
                     Container(
@@ -127,8 +111,9 @@ class StatsScreen extends StatelessWidget {
                         color: AppTheme.green.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                         border: Border.all(
-                            color: AppTheme.green.withValues(alpha: 0.4),
-                            width: 2),
+                          color: AppTheme.green.withValues(alpha: 0.4),
+                          width: 2,
+                        ),
                       ),
                       child: const Icon(Icons.verified_rounded,
                           color: AppTheme.green, size: 34),
@@ -166,29 +151,14 @@ class StatsScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                   ],
 
-                  // ── Accuracy card ────────────────────────
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AppTheme.border),
-                    ),
+                  // Accuracy card
+                  StatCard(
+                    label: 'Accuracy Rate',
+                    icon: Icons.track_changes_rounded,
+                    fullWidth: true,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              'ACCURACY RATE',
-                              style: AppTheme.labelSmall,
-                            ),
-                            const Spacer(),
-                            const Icon(Icons.track_changes_rounded,
-                                color: AppTheme.primary, size: 16),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -223,9 +193,8 @@ class StatsScreen extends StatelessWidget {
                           child: LinearProgressIndicator(
                             value: accuracy,
                             backgroundColor: AppTheme.cardDark,
-                            valueColor:
-                                const AlwaysStoppedAnimation<Color>(
-                                    AppTheme.green),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                AppTheme.green),
                             minHeight: 6,
                           ),
                         ),
@@ -234,11 +203,11 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // ── Speed + Tries row ────────────────────
+                  // Speed + Tries row
                   Row(
                     children: [
                       Expanded(
-                        child: _StatCard(
+                        child: StatCard(
                           label: 'Avg Speed',
                           icon: Icons.timer_outlined,
                           child: Column(
@@ -276,7 +245,7 @@ class StatsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _StatCard(
+                        child: StatCard(
                           label: 'Total Tries',
                           icon: Icons.repeat_rounded,
                           child: Column(
@@ -292,7 +261,9 @@ class StatsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                provider.totalAttempts - provider.totalCorrect > 0
+                                provider.totalAttempts -
+                                            provider.totalCorrect >
+                                        0
                                     ? '${provider.totalAttempts - provider.totalCorrect} Critical Errors'
                                     : 'No errors!',
                                 style: GoogleFonts.inter(
@@ -308,8 +279,8 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // ── Best streak ──────────────────────────
-                  _StatCard(
+                  // Best streak
+                  StatCard(
                     label: 'Best Streak',
                     icon: Icons.local_fire_department_rounded,
                     fullWidth: true,
@@ -324,7 +295,7 @@ class StatsScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          ' / 10',
+                          ' / ${AppConstants.streakGoal}',
                           style: GoogleFonts.inter(
                             color: AppTheme.textSecondary,
                             fontSize: 18,
@@ -337,7 +308,8 @@ class StatsScreen extends StatelessWidget {
                           child: SizedBox(
                             width: 80,
                             child: LinearProgressIndicator(
-                              value: provider.bestStreak / 10.0,
+                              value: provider.bestStreak /
+                                  AppConstants.streakGoal,
                               backgroundColor: AppTheme.cardDark,
                               valueColor:
                                   const AlwaysStoppedAnimation<Color>(
@@ -351,58 +323,14 @@ class StatsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
-                  // ── Achievement ──────────────────────────
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: AppTheme.surface,
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: BoxDecoration(
-                            color: AppTheme.primary.withValues(alpha: 0.15),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.star_rounded,
-                              color: AppTheme.primary, size: 22),
-                        ),
-                        const SizedBox(width: 14),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _achievement(
-                                    provider.bestStreak, accuracy),
-                                style: GoogleFonts.inter(
-                                  color: AppTheme.textPrimary,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                _achievementSub(
-                                    provider.bestStreak, accuracy),
-                                style: GoogleFonts.inter(
-                                  color: AppTheme.primary,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                  // Achievement
+                  AchievementCard(
+                    bestStreak: provider.bestStreak,
+                    accuracy: accuracy,
                   ),
                   const SizedBox(height: 28),
 
-                  // ── Action buttons ───────────────────────
+                  // Action buttons (only from quiz flow, not standalone)
                   if (!isStandalone)
                     Row(
                       children: [
@@ -420,8 +348,8 @@ class StatsScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 15),
                               shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(14)),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                             child: Text('Home',
                                 style: GoogleFonts.inter(
@@ -438,8 +366,8 @@ class StatsScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 15),
                               shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(14)),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                               elevation: 0,
                             ),
                             child: Text('Retry',
@@ -457,43 +385,4 @@ class StatsScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class _StatCard extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Widget child;
-  final bool fullWidth;
-
-  const _StatCard({
-    required this.label,
-    required this.icon,
-    required this.child,
-    this.fullWidth = false,
-  });
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: fullWidth ? double.infinity : null,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.border),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: AppTheme.textSecondary, size: 14),
-                const SizedBox(width: 6),
-                Text(label, style: AppTheme.labelSmall),
-              ],
-            ),
-            const SizedBox(height: 10),
-            child,
-          ],
-        ),
-      );
 }

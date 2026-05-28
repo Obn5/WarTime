@@ -1,9 +1,9 @@
-import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import '../app/constants.dart';
+import '../models/question.dart';
 import '../models/quiz_set.dart';
 import '../models/topic.dart';
-import '../models/question.dart';
 
 enum QuizPhase { idle, answering, revealing, quintetStats, complete }
 
@@ -18,12 +18,12 @@ class QuizProvider extends ChangeNotifier {
   int? _selectedAnswer;
   QuizPhase _phase = QuizPhase.idle;
 
-  // Quintet (every 5 questions)
+  // Quintet tracking
   int _quintetCount = 0;
   int _quintetCorrect = 0;
   final List<Map<String, dynamic>> _quintetHistory = [];
 
-  // XP / level (persists across quizzes in session)
+  // XP / level (session-wide)
   int _xp = 0;
 
   // Per-quiz stats
@@ -31,7 +31,7 @@ class QuizProvider extends ChangeNotifier {
   int _totalTimeMs = 0;
   DateTime? _questionStart;
 
-  // Getters
+  // ── Getters ───────────────────────────────────────────────
   QuizSet? get quizSet => _quizSet;
   Topic? get selectedTopic => _selectedTopic;
   Question? get currentQuestion =>
@@ -41,28 +41,24 @@ class QuizProvider extends ChangeNotifier {
   int get totalAttempts => _totalAttempts;
   int? get selectedAnswer => _selectedAnswer;
   QuizPhase get phase => _phase;
-  int get quintetCorrect => _quintetCorrect;
   List<Map<String, dynamic>> get quintetHistory =>
       List.unmodifiable(_quintetHistory);
   int get bestStreak => _bestStreak;
   int get totalTimeMs => _totalTimeMs;
   int get xp => _xp;
-  int get level => (_xp ~/ 100) + 1;
+  int get level => (_xp ~/ AppConstants.xpPerLevel) + 1;
   double get accuracy =>
       _totalAttempts == 0 ? 0.0 : _totalCorrect / _totalAttempts;
   int get avgTimeMs =>
       _totalAttempts == 0 ? 0 : (_totalTimeMs / _totalAttempts).round();
 
-  void loadFromJson(String jsonString) {
-    try {
-      final data = json.decode(jsonString) as Map<String, dynamic>;
-      _quizSet = QuizSet.fromJson(data);
-      _selectedTopic = null;
-      _phase = QuizPhase.idle;
-      notifyListeners();
-    } catch (e) {
-      debugPrint('JSON parse error: $e');
-    }
+  // ── Actions ───────────────────────────────────────────────
+
+  void loadQuizSet(QuizSet quizSet) {
+    _quizSet = quizSet;
+    _selectedTopic = null;
+    _phase = QuizPhase.idle;
+    notifyListeners();
   }
 
   void selectTopic(Topic topic) {
@@ -105,7 +101,7 @@ class QuizProvider extends ChangeNotifier {
       _totalCorrect++;
       _correctStreak++;
       _quintetCorrect++;
-      _xp += 10;
+      _xp += AppConstants.xpPerCorrect;
       if (_correctStreak > _bestStreak) _bestStreak = _correctStreak;
     } else {
       _correctStreak = 0;
@@ -116,12 +112,14 @@ class QuizProvider extends ChangeNotifier {
   }
 
   void nextQuestion() {
-    if (_correctStreak >= 10) {
+    // Win: streak goal reached
+    if (_correctStreak >= AppConstants.streakGoal) {
       _phase = QuizPhase.complete;
       notifyListeners();
       return;
     }
-    if (_quintetCount >= 5) {
+    // Quintet checkpoint
+    if (_quintetCount >= AppConstants.quintetSize) {
       _quintetHistory.add({
         'correct': _quintetCorrect,
         'total': _quintetCount,
@@ -138,18 +136,18 @@ class QuizProvider extends ChangeNotifier {
 
   void continueAfterQuintet() => _advance();
 
+  void reset() {
+    _selectedTopic = null;
+    _selectedAnswer = null;
+    _phase = QuizPhase.idle;
+    notifyListeners();
+  }
+
   void _advance() {
     _currentIndex = (_currentIndex + 1) % _questions.length;
     _selectedAnswer = null;
     _questionStart = DateTime.now();
     _phase = QuizPhase.answering;
-    notifyListeners();
-  }
-
-  void reset() {
-    _selectedTopic = null;
-    _selectedAnswer = null;
-    _phase = QuizPhase.idle;
     notifyListeners();
   }
 }

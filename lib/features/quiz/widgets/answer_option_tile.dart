@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../theme/app_theme.dart';
+import '../../../app/app_theme.dart';
 
 enum AnswerState { idle, correct, wrong }
 
@@ -30,8 +30,7 @@ class AnswerOptionTile extends StatelessWidget {
         textColor = AppTheme.correct;
         radio = _FilledCircle(
           color: AppTheme.correct,
-          child: const Icon(Icons.check_rounded,
-              color: Colors.white, size: 13),
+          child: const Icon(Icons.check_rounded, color: Colors.white, size: 13),
         );
       case AnswerState.wrong:
         bg = AppTheme.wrongBg;
@@ -39,8 +38,7 @@ class AnswerOptionTile extends StatelessWidget {
         textColor = AppTheme.wrong;
         radio = _FilledCircle(
           color: AppTheme.wrong,
-          child: const Icon(Icons.close_rounded,
-              color: Colors.white, size: 13),
+          child: const Icon(Icons.close_rounded, color: Colors.white, size: 13),
         );
       case AnswerState.idle:
         bg = AppTheme.cardLight;
@@ -52,8 +50,9 @@ class AnswerOptionTile extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-                color: AppTheme.textDarkMuted.withValues(alpha: 0.4),
-                width: 1.5),
+              color: AppTheme.textDarkMuted.withValues(alpha: 0.4),
+              width: 1.5,
+            ),
           ),
         );
     }
@@ -62,8 +61,7 @@ class AnswerOptionTile extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(14),

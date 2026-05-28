@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/topic.dart';
-import '../theme/app_theme.dart';
+import '../../../app/app_theme.dart';
+import '../../../models/topic.dart';
 
 class TopicCard extends StatelessWidget {
   final Topic topic;
   final int index;
+  final bool isSelected;
   final VoidCallback onTap;
 
   const TopicCard({
     super.key,
     required this.topic,
     required this.index,
+    required this.isSelected,
     required this.onTap,
   });
 
@@ -33,38 +35,53 @@ class TopicCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Subtle dot pattern overlay
+            // Dot-grid overlay
             Positioned.fill(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: CustomPaint(painter: _DotPainter()),
               ),
             ),
+
+            // Selected border
+            if (isSelected)
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppTheme.primary,
+                      width: 2,
+                    ),
+                  ),
+                ),
+              ),
+
             // Content
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category chip
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2)),
-                    ),
-                    child: Text(
-                      'PHYSICS',
-                      style: GoogleFonts.inter(
-                        color: Colors.white,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
+                  // Category + selected check
+                  Row(
+                    children: [
+                      _Pill('PHYSICS'),
+                      const Spacer(),
+                      if (isSelected)
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: const BoxDecoration(
+                            color: AppTheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            color: AppTheme.bg,
+                            size: 11,
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -81,7 +98,7 @@ class TopicCard extends StatelessWidget {
                     Text(
                       topic.description,
                       style: GoogleFonts.inter(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: Colors.white.withValues(alpha: 0.65),
                         fontSize: 11,
                         height: 1.4,
                       ),
@@ -95,11 +112,11 @@ class TopicCard extends StatelessWidget {
                       Text(
                         '${topic.questions.length} questions',
                         style: GoogleFonts.inter(
-                          color: Colors.white.withValues(alpha: 0.6),
+                          color: Colors.white.withValues(alpha: 0.55),
                           fontSize: 11,
                         ),
                       ),
-                      _DifficultyChip(difficulty: topic.difficulty),
+                      _DifficultyChip(topic.difficulty),
                     ],
                   ),
                 ],
@@ -112,9 +129,34 @@ class TopicCard extends StatelessWidget {
   }
 }
 
+class _Pill extends StatelessWidget {
+  final String text;
+  const _Pill(this.text);
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.15),
+          borderRadius: BorderRadius.circular(20),
+          border:
+              Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.inter(
+            color: Colors.white,
+            fontSize: 9,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+      );
+}
+
 class _DifficultyChip extends StatelessWidget {
   final String difficulty;
-  const _DifficultyChip({required this.difficulty});
+  const _DifficultyChip(this.difficulty);
 
   @override
   Widget build(BuildContext context) {
@@ -125,7 +167,7 @@ class _DifficultyChip extends StatelessWidget {
       case 'hard':
         color = const Color(0xFFEF5350);
       default:
-        color = const Color(0xFFE4C693);
+        color = AppTheme.primary;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -140,14 +182,12 @@ class _DifficultyChip extends StatelessWidget {
           color: color,
           fontSize: 9,
           fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
         ),
       ),
     );
   }
 }
 
-// Subtle dot-grid overlay
 class _DotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -155,10 +195,9 @@ class _DotPainter extends CustomPainter {
       ..color = Colors.white.withValues(alpha: 0.04)
       ..style = PaintingStyle.fill;
     const spacing = 18.0;
-    const radius = 1.2;
     for (double x = spacing; x < size.width; x += spacing) {
       for (double y = spacing; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), radius, paint);
+        canvas.drawCircle(Offset(x, y), 1.2, paint);
       }
     }
   }
