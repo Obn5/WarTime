@@ -1,0 +1,244 @@
+{
+  "name": "Fields & Quarks",
+  "topics": [
+    {
+      "id": "energy_fields",
+      "name": "Energy Fields",
+      "description": "Explore wave-particle duality, fields, and the forces that shape reality.",
+      "difficulty": "Medium",
+      "questions": [
+        {
+          "question": "What is a field in physics?",
+          "tags": ["PHYSICS", "FIELDS"],
+          "options": [
+            "A chemical liquid",
+            "A value or quantity spread across space and time",
+            "A type of planet",
+            "A tiny hard ball inside atoms"
+          ],
+          "correct": 1,
+          "explanation": "A field is a physical quantity that has a value at every point in space and time. Examples include gravitational, electric, and magnetic fields."
+        },
+        {
+          "question": "Which field is responsible for electricity and magnetism?",
+          "tags": ["PHYSICS", "EM"],
+          "options": [
+            "Electromagnetic field",
+            "Sound field",
+            "Higgs field",
+            "Gravity field only"
+          ],
+          "correct": 0,
+          "explanation": "The electromagnetic field explains light, electricity, magnetism, radio waves, and X-rays. It is one of the four fundamental forces."
+        },
+        {
+          "question": "What does the Higgs field give to particles?",
+          "tags": ["PHYSICS", "HIGGS"],
+          "options": ["Charge", "Spin", "Mass", "Color"],
+          "correct": 2,
+          "explanation": "The Higgs field permeates all of space. When particles interact with it, they acquire mass. The Higgs boson was confirmed at CERN in 2012."
+        },
+        {
+          "question": "Which fundamental force has infinite range?",
+          "tags": ["FORCES"],
+          "options": [
+            "Strong nuclear force",
+            "Weak nuclear force",
+            "Gravity",
+            "Only strong and weak"
+          ],
+          "correct": 2,
+          "explanation": "Both gravity and electromagnetism have infinite range. Gravity dominates at large scales because it is always attractive and acts on all mass-energy."
+        },
+        {
+          "question": "What particle carries the electromagnetic force?",
+          "tags": ["PARTICLE", "EM"],
+          "options": ["Graviton", "Gluon", "W boson", "Photon"],
+          "correct": 3,
+          "explanation": "The photon is the force-carrying particle of the electromagnetic field. It is massless and always travels at the speed of light."
+        },
+        {
+          "question": "What is a gravitational field?",
+          "tags": ["GRAVITY"],
+          "options": [
+            "A magnetic shield around planets",
+            "A region where a mass experiences gravitational force",
+            "The area inside a black hole",
+            "The spin of electrons around the nucleus"
+          ],
+          "correct": 1,
+          "explanation": "A gravitational field is a region of space where a mass experiences gravitational force. Described by Einstein's general relativity as curvature of spacetime."
+        },
+        {
+          "question": "What is a quantum field?",
+          "tags": ["QUANTUM", "FIELDS"],
+          "options": [
+            "A field only visible under a microscope",
+            "A field that is quantized into discrete particles",
+            "A field inside an atom only",
+            "A rotating magnetic field"
+          ],
+          "correct": 1,
+          "explanation": "In quantum field theory, every fundamental particle is an excitation (vibration) of an underlying quantum field that permeates all of space."
+        },
+        {
+          "question": "Which field is associated with the W and Z bosons?",
+          "tags": ["FORCES", "PARTICLE"],
+          "options": [
+            "Strong nuclear field",
+            "Weak nuclear field",
+            "Electromagnetic field",
+            "Gravitational field"
+          ],
+          "correct": 1,
+          "explanation": "The W and Z bosons carry the weak nuclear force, responsible for radioactive beta decay. They are about 80-91 times heavier than a proton."
+        },
+        {
+          "question": "How does gravity compare to electromagnetism in strength?",
+          "tags": ["FORCES"],
+          "options": [
+            "Gravity is stronger by 10 times",
+            "They are equal in strength",
+            "Gravity is roughly 10^36 times weaker",
+            "Electromagnetism is 2 times weaker"
+          ],
+          "correct": 2,
+          "explanation": "Gravity is about 10^36 times weaker than electromagnetism. Yet gravity dominates at cosmic scales because it cannot be shielded or cancelled."
+        },
+        {
+          "question": "What did CERN confirm in 2012?",
+          "tags": ["HISTORY", "HIGGS"],
+          "options": [
+            "Gravitons exist",
+            "The Higgs boson exists",
+            "Dark matter was detected",
+            "A fifth force was found"
+          ],
+          "correct": 1,
+          "explanation": "The Higgs boson was confirmed at CERN's Large Hadron Collider in July 2012, completing the Standard Model and confirming the mass-giving Higgs field."
+        }
+      ]
+    },
+    {
+      "id": "quarks",
+      "name": "Quarks & Hadrons",
+      "description": "Explore the subatomic world of quarks, gluons, and the strong nuclear force.",
+      "difficulty": "Hard",
+      "questions": [
+        {
+          "question": "Which fundamental particle acts as the mediator of the strong nuclear force, binding quarks together within protons and neutrons?",
+          "tags": ["PARTICLE", "STRONG FORCE"],
+          "formula": "F_s = -(g_s^2 / r) * exp(-m_n * r)",
+          "options": [
+            "Photon",
+            "W Boson",
+            "Gluon",
+            "Higgs Boson",
+            "Graviton"
+          ],
+          "correct": 2,
+          "explanation": "Gluons are the force-carrying particles of the strong nuclear force (QCD). They bind quarks together and carry color charge themselves, unlike photons which are chargeless."
+        },
+        {
+          "question": "How many quark flavors exist in the Standard Model?",
+          "tags": ["QUARKS"],
+          "options": ["4", "5", "6", "8"],
+          "correct": 2,
+          "explanation": "There are 6 quark flavors: up, down, charm, strange, top, and bottom. They come in three generations of increasing mass."
+        },
+        {
+          "question": "What are the three quarks inside a proton?",
+          "tags": ["QUARKS", "HADRONS"],
+          "formula": "p = uud  (charge: +2/3 + 2/3 - 1/3 = +1)",
+          "options": [
+            "Three up quarks",
+            "Two up quarks and one down quark",
+            "Two down quarks and one up quark",
+            "One up and two strange quarks"
+          ],
+          "correct": 1,
+          "explanation": "A proton consists of two up quarks (+2/3 each) and one down quark (-1/3), giving a total charge of +1. Quarks are held by gluons via the strong force."
+        },
+        {
+          "question": "What is quark confinement?",
+          "tags": ["QUARKS", "QCD"],
+          "options": [
+            "Quarks are found only in stars",
+            "Quarks cannot exist in isolation — they always form hadrons",
+            "Quarks are confined to the nucleus only",
+            "Quarks move faster than light"
+          ],
+          "correct": 1,
+          "explanation": "Quark confinement means quarks are never found alone. Trying to separate them creates new quark-antiquark pairs instead. They always bind into hadrons."
+        },
+        {
+          "question": "What is a meson?",
+          "tags": ["HADRONS"],
+          "options": [
+            "A particle made of 3 quarks",
+            "A particle made of a quark and an antiquark",
+            "A type of lepton",
+            "A force-carrying boson"
+          ],
+          "correct": 1,
+          "explanation": "A meson is a hadron made of one quark and one antiquark. Pions and kaons are common examples. Mesons are unstable and decay quickly."
+        },
+        {
+          "question": "How many 'colors' can a quark carry?",
+          "tags": ["QCD", "QUARKS"],
+          "options": [
+            "2 — black and white",
+            "3 — red, green, blue",
+            "4 — RGBW",
+            "6 — one per flavor"
+          ],
+          "correct": 1,
+          "explanation": "Quarks carry one of three color charges: red, green, or blue. This is Quantum Chromodynamics (QCD). 'Color' is a metaphor — not actual visible color."
+        },
+        {
+          "question": "What is the charge of a down quark?",
+          "tags": ["QUARKS"],
+          "options": ["+1/3", "-1/3", "+2/3", "-2/3"],
+          "correct": 1,
+          "explanation": "The down quark has a charge of -1/3. Two up quarks (+2/3 each) plus one down quark (-1/3) produce the proton's total charge of +1."
+        },
+        {
+          "question": "Which quark is the heaviest?",
+          "tags": ["QUARKS"],
+          "options": [
+            "Up quark",
+            "Strange quark",
+            "Bottom quark",
+            "Top quark"
+          ],
+          "correct": 3,
+          "explanation": "The top quark is the heaviest at ~173 GeV/c² — roughly as massive as an entire tungsten atom. It decays before it can form hadrons."
+        },
+        {
+          "question": "What is a baryon?",
+          "tags": ["HADRONS"],
+          "options": [
+            "A particle made of 2 quarks",
+            "A particle made of 3 quarks",
+            "A quark-antiquark pair",
+            "A massless boson"
+          ],
+          "correct": 1,
+          "explanation": "A baryon is a hadron made of three quarks. Protons and neutrons are the most common baryons. Baryons are subject to baryon number conservation."
+        },
+        {
+          "question": "What does QCD stand for?",
+          "tags": ["QCD"],
+          "options": [
+            "Quantum Classical Dynamics",
+            "Quantum Chromodynamics",
+            "Quark Confinement Definition",
+            "Quantum Charge Decay"
+          ],
+          "correct": 1,
+          "explanation": "QCD — Quantum Chromodynamics — is the theory describing the strong interaction between quarks via gluons. 'Chromo' refers to the color charge carried by quarks."
+        }
+      ]
+    }
+  ]
+}
