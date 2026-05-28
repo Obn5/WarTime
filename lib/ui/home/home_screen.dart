@@ -1,11 +1,13 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
+import '../../core/app_colors.dart';
 import '../../core/constants.dart';
 import '../../state/quiz_provider.dart';
 import '../../data/services/json_service.dart';
 import '../quiz/quiz_screen.dart';
+import '../shared/pressable.dart';
+import '../shared/theme_dropdown.dart';
 import '../stats/stats_screen.dart';
 import 'widgets/import_card.dart';
 import 'widgets/topic_card.dart';
@@ -31,41 +33,47 @@ class HomeScreen extends StatelessWidget {
     context.read<QuizProvider>().startQuiz();
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const QuizScreen()),
+      PageRouteBuilder(
+        pageBuilder: (_, anim, __) => const QuizScreen(),
+        transitionsBuilder: (_, anim, __, child) => FadeTransition(
+          opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
+          child: child,
+        ),
+        transitionDuration: const Duration(milliseconds: 280),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<QuizProvider>();
+    final c = Theme.of(context).extension<AppColors>()!;
     final quizSet = provider.quizSet;
 
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: c.bg,
       body: Column(
         children: [
-          // ── Top nav ───────────────────────────────────────
+          // ── Top nav ─────────────────────────────────────────
           SafeArea(
             bottom: false,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
                 children: [
-                  const Icon(Icons.grid_view_rounded,
-                      color: AppTheme.primary, size: 18),
+                  Icon(Icons.grid_view_rounded, color: c.primary, size: 18),
                   const SizedBox(width: 8),
                   Text(
                     quizSet?.name ?? AppConstants.appName,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textPrimary,
+                      color: c.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const Spacer(),
                   if (provider.totalAttempts > 0) ...[
-                    GestureDetector(
+                    Pressable(
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -79,19 +87,19 @@ class HomeScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
-                          color: AppTheme.cardDark,
+                          color: c.cardDark,
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: AppTheme.border),
+                          border: Border.all(color: c.border),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.bar_chart_rounded,
-                                color: AppTheme.primary, size: 15),
+                            Icon(Icons.bar_chart_rounded,
+                                color: c.primary, size: 15),
                             const SizedBox(width: 5),
                             Text(
                               '${(provider.accuracy * 100).round()}%',
                               style: GoogleFonts.inter(
-                                color: AppTheme.primary,
+                                color: c.primary,
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -102,23 +110,13 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 10),
                   ],
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: AppTheme.cardDark,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: const Icon(Icons.person_outline_rounded,
-                        color: AppTheme.textSecondary, size: 18),
-                  ),
+                  const ThemeDropdown(),
                 ],
               ),
             ),
           ),
 
-          // ── Scrollable body ────────────────────────────────
+          // ── Body ─────────────────────────────────────────────
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
@@ -126,12 +124,10 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 24),
-
-                  // Welcome header
                   Text(
                     'Welcome, Explorer',
                     style: GoogleFonts.inter(
-                      color: AppTheme.textPrimary,
+                      color: c.textPrimary,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                       height: 1.2,
@@ -141,13 +137,10 @@ class HomeScreen extends StatelessWidget {
                   Text(
                     AppConstants.appTagline,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textSecondary,
-                      fontSize: 14,
-                    ),
+                        color: c.textSecondary, fontSize: 14),
                   ),
                   const SizedBox(height: 28),
 
-                  // Import card
                   ImportCard(
                     onBrowse: () => _importJson(context),
                     onSample: () => _loadSample(context),
@@ -157,14 +150,12 @@ class HomeScreen extends StatelessWidget {
 
                   if (quizSet != null) ...[
                     const SizedBox(height: 32),
-
-                    // Topic header
                     Row(
                       children: [
                         Text(
                           'Select Topic',
                           style: GoogleFonts.inter(
-                            color: AppTheme.textPrimary,
+                            color: c.textPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -173,7 +164,7 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           'View All',
                           style: GoogleFonts.inter(
-                            color: AppTheme.primary,
+                            color: c.primary,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -182,7 +173,6 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
 
-                    // Horizontal topic cards
                     SizedBox(
                       height: 210,
                       child: ListView.separated(
@@ -205,34 +195,31 @@ class HomeScreen extends StatelessWidget {
 
                     const SizedBox(height: 28),
 
-                    // Start button
                     if (provider.selectedTopic != null)
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          onPressed: () => _startQuiz(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.green,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            elevation: 0,
+                      Pressable(
+                        onTap: () => _startQuiz(context),
+                        child: Container(
+                          width: double.infinity,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: c.green,
+                            borderRadius: BorderRadius.circular(14),
                           ),
+                          alignment: Alignment.center,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 'Start Learning',
                                 style: GoogleFonts.inter(
+                                  color: Colors.white,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15,
                                 ),
                               ),
                               const SizedBox(width: 8),
                               const Icon(Icons.arrow_forward_rounded,
-                                  size: 18),
+                                  color: Colors.white, size: 18),
                             ],
                           ),
                         ),
@@ -245,15 +232,13 @@ class HomeScreen extends StatelessWidget {
                           Icon(
                             Icons.explore_outlined,
                             size: 64,
-                            color: AppTheme.textMuted.withValues(alpha: 0.35),
+                            color: c.textMuted.withValues(alpha: 0.35),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             'Import a JSON file to begin',
                             style: GoogleFonts.inter(
-                              color: AppTheme.textSecondary,
-                              fontSize: 14,
-                            ),
+                                color: c.textSecondary, fontSize: 14),
                           ),
                         ],
                       ),

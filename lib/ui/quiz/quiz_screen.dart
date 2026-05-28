@@ -1,9 +1,11 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme.dart';
+import '../../core/app_colors.dart';
 import '../../core/constants.dart';
 import '../../state/quiz_provider.dart';
+import '../shared/pressable.dart';
+import '../shared/theme_dropdown.dart';
 import '../stats/stats_screen.dart';
 import 'quintet_view.dart';
 import 'widgets/answer_option_tile.dart';
@@ -17,6 +19,7 @@ class QuizScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<QuizProvider>();
+    final c = Theme.of(context).extension<AppColors>()!;
 
     switch (provider.phase) {
       case QuizPhase.complete:
@@ -38,23 +41,20 @@ class QuizScreen extends StatelessWidget {
 
     final selected = provider.selectedAnswer;
     final isRevealing = provider.phase == QuizPhase.revealing;
-    final isCorrect =
-        selected != null && selected == question.correctIndex;
+    final isCorrect = selected != null && selected == question.correctIndex;
 
     return Scaffold(
-      backgroundColor: AppTheme.bg,
+      backgroundColor: c.bg,
       body: Column(
         children: [
-          // ── Top nav ────────────────────────────────────────
+          // ── Top nav ─────────────────────────────────────────
           SafeArea(
             bottom: false,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               child: Row(
                 children: [
-                  // Close
-                  GestureDetector(
+                  Pressable(
                     onTap: () {
                       provider.reset();
                       Navigator.pop(context);
@@ -62,44 +62,41 @@ class QuizScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: AppTheme.cardDark,
+                        color: c.cardDark,
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: AppTheme.border),
+                        border: Border.all(color: c.border),
                       ),
-                      child: const Icon(Icons.close_rounded,
-                          color: AppTheme.textSecondary, size: 16),
+                      child: Icon(Icons.close_rounded,
+                          color: c.textSecondary, size: 16),
                     ),
                   ),
                   const SizedBox(width: 12),
-
-                  // App name
-                  const Icon(Icons.grid_view_rounded,
-                      color: AppTheme.primary, size: 15),
+                  Icon(Icons.grid_view_rounded, color: c.primary, size: 15),
                   const SizedBox(width: 6),
                   Text(
                     AppConstants.appName,
                     style: GoogleFonts.inter(
-                      color: AppTheme.textPrimary,
+                      color: c.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const Spacer(),
-
                   // LVL badge
-                  Container(
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppTheme.primary.withValues(alpha: 0.15),
+                      color: c.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                          color: AppTheme.primary.withValues(alpha: 0.3)),
+                          color: c.primary.withValues(alpha: 0.3)),
                     ),
                     child: Text(
                       'LVL ${provider.level}',
                       style: GoogleFonts.inter(
-                        color: AppTheme.primary,
+                        color: c.primary,
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
@@ -107,25 +104,13 @@ class QuizScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 10),
-
-                  // Avatar
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppTheme.cardDark,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: const Icon(Icons.person_outline_rounded,
-                        color: AppTheme.textSecondary, size: 16),
-                  ),
+                  const ThemeDropdown(),
                 ],
               ),
             ),
           ),
 
-          // ── Streak bar ─────────────────────────────────────
+          // ── Streak bar ───────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: StreakBar(
@@ -135,21 +120,27 @@ class QuizScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // ── Scrollable question + options ──────────────────
+          // ── Question + options ───────────────────────────────
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Question card
-                  QuestionCard(
-                    question: question,
-                    topicName: provider.selectedTopic?.name,
+                  // Question card fades on new question
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    switchInCurve: Curves.easeOut,
+                    switchOutCurve: Curves.easeIn,
+                    child: QuestionCard(
+                      key: ValueKey(question.question),
+                      question: question,
+                      topicName: provider.selectedTopic?.name,
+                    ),
                   ),
                   const SizedBox(height: 14),
 
-                  // Answer options
+                  // Answer options — staggered slide-in
                   ...List.generate(question.options.length, (i) {
                     AnswerState state = AnswerState.idle;
                     if (isRevealing) {
@@ -162,53 +153,49 @@ class QuizScreen extends StatelessWidget {
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: AnswerOptionTile(
+                        key: ValueKey('${question.question}_$i'),
                         text: question.options[i],
                         state: state,
-                        onTap: isRevealing
-                            ? null
-                            : () => provider.submitAnswer(i),
+                        animIndex: i,
+                        onTap: isRevealing ? null : () => provider.submitAnswer(i),
                       ),
                     );
                   }),
 
-                  // Explanation + next button
+                  // Explanation + next
                   if (isRevealing) ...[
                     const SizedBox(height: 4),
                     ExplanationPanel(
                       isCorrect: isCorrect,
-                      correctAnswer:
-                          question.options[question.correctIndex],
+                      correctAnswer: question.options[question.correctIndex],
                       explanation: question.explanation,
                     ),
                     const SizedBox(height: 14),
-                    SizedBox(
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: provider.nextQuestion,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.green,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 0,
+                    Pressable(
+                      onTap: provider.nextQuestion,
+                      child: Container(
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: c.green,
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                        alignment: Alignment.center,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              provider.correctStreak >=
-                                      AppConstants.streakGoal
+                              provider.correctStreak >= AppConstants.streakGoal
                                   ? 'Mission Complete!'
                                   : 'Next Question',
                               style: GoogleFonts.inter(
+                                color: Colors.white,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 14,
                               ),
                             ),
                             const SizedBox(width: 6),
                             const Icon(Icons.arrow_forward_rounded,
-                                size: 16),
+                                color: Colors.white, size: 16),
                           ],
                         ),
                       ),
@@ -220,10 +207,7 @@ class QuizScreen extends StatelessWidget {
                     child: Text(
                       'answer  ·  flash  ·  explanation  ·  next card',
                       style: GoogleFonts.inter(
-                        color: AppTheme.textMuted,
-                        fontSize: 10,
-                        letterSpacing: 0.5,
-                      ),
+                          color: c.textMuted, fontSize: 10, letterSpacing: 0.5),
                     ),
                   ),
                   const SizedBox(height: 24),

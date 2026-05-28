@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../core/theme.dart';
+import '../../../core/app_colors.dart';
 import '../../../data/models/topic.dart';
+import '../../shared/pressable.dart';
 
 class TopicCard extends StatelessWidget {
   final Topic topic;
@@ -19,11 +20,14 @@ class TopicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradient = AppTheme.gradientFor(index);
+    final c = Theme.of(context).extension<AppColors>()!;
+    final gradient = c.gradientFor(index);
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
-      child: Container(
+      scale: 0.97,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
         width: 220,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -32,6 +36,18 @@ class TopicCard extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: gradient,
           ),
+          border: isSelected
+              ? Border.all(color: c.primary, width: 2)
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: c.primary.withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
         ),
         child: Stack(
           children: [
@@ -42,43 +58,28 @@ class TopicCard extends StatelessWidget {
                 child: CustomPaint(painter: _DotPainter()),
               ),
             ),
-
-            // Selected border
-            if (isSelected)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: AppTheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                ),
-              ),
-
             // Content
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Category + selected check
                   Row(
                     children: [
                       _Pill('PHYSICS'),
                       const Spacer(),
                       if (isSelected)
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: AppTheme.primary,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.check_rounded,
-                            color: AppTheme.bg,
-                            size: 11,
+                        AnimatedScale(
+                          scale: isSelected ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 200),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: c.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.check_rounded,
+                                color: c.bg, size: 11),
                           ),
                         ),
                     ],
@@ -139,8 +140,7 @@ class _Pill extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(20),
-          border:
-              Border.all(color: Colors.white.withValues(alpha: 0.2)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
         ),
         child: Text(
           text,
@@ -167,7 +167,7 @@ class _DifficultyChip extends StatelessWidget {
       case 'hard':
         color = const Color(0xFFEF5350);
       default:
-        color = AppTheme.primary;
+        color = const Color(0xFFC4A66A);
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
