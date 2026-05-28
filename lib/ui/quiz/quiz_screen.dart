@@ -7,6 +7,7 @@ import '../../state/quiz_provider.dart';
 import '../shared/pressable.dart';
 import '../shared/theme_dropdown.dart';
 import '../stats/stats_screen.dart';
+import 'level_complete_view.dart';
 import 'quintet_view.dart';
 import 'widgets/answer_option_tile.dart';
 import 'widgets/explanation_panel.dart';
@@ -24,6 +25,16 @@ class QuizScreen extends StatelessWidget {
     switch (provider.phase) {
       case QuizPhase.complete:
         return const StatsScreen(isComplete: true);
+      case QuizPhase.levelComplete:
+        return LevelCompleteView(
+          levelIndex: provider.currentLevelIndex,
+          totalLevels: provider.totalLevels,
+          correct: provider.totalCorrect,
+          total: provider.totalAttempts,
+          accuracy: provider.accuracy,
+          xpEarned: provider.xp,
+          onNext: provider.advanceToNextLevel,
+        );
       case QuizPhase.quintetStats:
         return QuintetView(
           history: provider.quintetHistory.last,

@@ -6,7 +6,7 @@
         android:maxSdkVersion="32" />
 
     <application
-        android:label="Fields and Quarks"
+        android:label="War Time"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

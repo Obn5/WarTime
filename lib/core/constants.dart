@@ -8,5 +8,5 @@ class AppConstants {
   static const int xpPerCorrect = 10;
   static const int xpPerLevel = 100;
 
-  static const String sampleAssetPath = 'assets/sample_quiz.json';
+  static const String sampleAssetPath = 'assets/quiz_webdev.json';
 }

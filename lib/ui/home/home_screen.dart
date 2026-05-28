@@ -9,6 +9,7 @@ import '../quiz/quiz_screen.dart';
 import '../shared/pressable.dart';
 import '../shared/theme_dropdown.dart';
 import '../stats/stats_screen.dart';
+import 'topics_screen.dart';
 import 'widgets/import_card.dart';
 import 'widgets/topic_card.dart';
 
@@ -161,12 +162,40 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                         const Spacer(),
-                        Text(
-                          'View All',
-                          style: GoogleFonts.inter(
-                            color: c.primary,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                        Pressable(
+                          onTap: () => Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (_, anim, __) =>
+                                  const TopicsScreen(),
+                              transitionsBuilder: (_, anim, __, child) =>
+                                  FadeTransition(
+                                opacity: CurvedAnimation(
+                                    parent: anim, curve: Curves.easeOut),
+                                child: child,
+                              ),
+                              transitionDuration:
+                                  const Duration(milliseconds: 250),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 2),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'View All',
+                                  style: GoogleFonts.inter(
+                                    color: c.primary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(width: 3),
+                                Icon(Icons.arrow_forward_ios_rounded,
+                                    color: c.primary, size: 11),
+                              ],
+                            ),
                           ),
                         ),
                       ],

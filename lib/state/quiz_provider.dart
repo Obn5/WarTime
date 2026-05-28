@@ -1,15 +1,16 @@
-﻿import 'dart:math';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../core/constants.dart';
 import '../data/models/question.dart';
 import '../data/models/quiz_set.dart';
 import '../data/models/topic.dart';
 
-enum QuizPhase { idle, answering, revealing, quintetStats, complete }
+enum QuizPhase { idle, answering, revealing, quintetStats, levelComplete, complete }
 
 class QuizProvider extends ChangeNotifier {
   QuizSet? _quizSet;
   Topic? _selectedTopic;
+  List<Question> _allTopicQuestions = [];
   List<Question> _questions = [];
   int _currentIndex = 0;
   int _correctStreak = 0;
@@ -17,6 +18,12 @@ class QuizProvider extends ChangeNotifier {
   int _totalAttempts = 0;
   int? _selectedAnswer;
   QuizPhase _phase = QuizPhase.idle;
+
+  // Level system
+  int _levelIndex = 0;
+  bool _isLeveledTopic = false;
+  final Set<int> _seenIndices = {};
+  static const int _levelSize = 20;
 
   // Quintet tracking
   int _quintetCount = 0;
@@ -52,6 +59,16 @@ class QuizProvider extends ChangeNotifier {
   int get avgTimeMs =>
       _totalAttempts == 0 ? 0 : (_totalTimeMs / _totalAttempts).round();
 
+  // Level getters
+  bool get isLeveledTopic => _isLeveledTopic;
+  int get currentLevelIndex => _levelIndex;
+  int get totalLevels => _isLeveledTopic
+      ? (_allTopicQuestions.length / _levelSize).ceil()
+      : 1;
+  bool get hasNextLevel => _isLeveledTopic && _levelIndex < totalLevels - 1;
+  int get levelQuestionsTotal => _questions.length;
+  int get levelQuestionsSeen => _seenIndices.length;
+
   // ── Actions ───────────────────────────────────────────────
 
   void loadQuizSet(QuizSet quizSet) {
@@ -68,20 +85,41 @@ class QuizProvider extends ChangeNotifier {
 
   void startQuiz() {
     if (_selectedTopic == null) return;
-    _questions = List.from(_selectedTopic!.questions)..shuffle(Random());
-    _currentIndex = 0;
-    _correctStreak = 0;
+    _allTopicQuestions = List.from(_selectedTopic!.questions);
+    _isLeveledTopic = _allTopicQuestions.length >= 100;
+    _levelIndex = 0;
+    _xp = 0;
+    _bestStreak = 0;
+    _totalTimeMs = 0;
     _totalCorrect = 0;
     _totalAttempts = 0;
+    _loadLevel();
+  }
+
+  void _loadLevel() {
+    if (_isLeveledTopic) {
+      final start = _levelIndex * _levelSize;
+      final end = min(start + _levelSize, _allTopicQuestions.length);
+      _questions =
+          List.from(_allTopicQuestions.sublist(start, end))..shuffle(Random());
+    } else {
+      _questions = List.from(_allTopicQuestions)..shuffle(Random());
+    }
+    _currentIndex = 0;
+    _correctStreak = 0;
     _selectedAnswer = null;
     _quintetCount = 0;
     _quintetCorrect = 0;
     _quintetHistory.clear();
-    _bestStreak = 0;
-    _totalTimeMs = 0;
+    _seenIndices.clear();
     _questionStart = DateTime.now();
     _phase = QuizPhase.answering;
     notifyListeners();
+  }
+
+  void advanceToNextLevel() {
+    _levelIndex++;
+    _loadLevel();
   }
 
   void submitAnswer(int index) {
@@ -95,6 +133,7 @@ class QuizProvider extends ChangeNotifier {
     _selectedAnswer = index;
     _totalAttempts++;
     _quintetCount++;
+    _seenIndices.add(_currentIndex);
 
     final isCorrect = index == _questions[_currentIndex].correctIndex;
     if (isCorrect) {
@@ -112,9 +151,15 @@ class QuizProvider extends ChangeNotifier {
   }
 
   void nextQuestion() {
-    // Win: streak goal reached
+    // Streak goal reached
     if (_correctStreak >= AppConstants.streakGoal) {
-      _phase = QuizPhase.complete;
+      _phase = hasNextLevel ? QuizPhase.levelComplete : QuizPhase.complete;
+      notifyListeners();
+      return;
+    }
+    // All level questions seen → level complete
+    if (_isLeveledTopic && _seenIndices.length >= _questions.length) {
+      _phase = hasNextLevel ? QuizPhase.levelComplete : QuizPhase.complete;
       notifyListeners();
       return;
     }

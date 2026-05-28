@@ -12,63 +12,97 @@ class AchievementCard extends StatelessWidget {
     required this.accuracy,
   });
 
-  String get _title {
-    if (bestStreak >= 10) return 'Quantum Master';
-    if (bestStreak >= 7) return 'Boson Hunter';
-    if (accuracy >= 0.9) return 'Sharp Mind';
-    if (accuracy >= 0.7) return 'Field Explorer';
-    return 'Curious Learner';
-  }
-
-  String get _subtitle {
-    if (bestStreak >= 10) return 'Reached 10-streak perfection.';
-    if (bestStreak >= 7) return 'Identified $bestStreak in a row.';
-    if (accuracy >= 0.9) return '90%+ accuracy maintained.';
-    if (accuracy >= 0.7) return 'Solid understanding of the field.';
-    return 'Every question brings you closer.';
+  _AchievementTier get _tier {
+    if (bestStreak >= 10) return _AchievementTier.quantumMaster;
+    if (bestStreak >= 7) return _AchievementTier.bosonHunter;
+    if (accuracy >= 0.9) return _AchievementTier.sharpMind;
+    if (accuracy >= 0.7) return _AchievementTier.fieldExplorer;
+    return _AchievementTier.curiousLearner;
   }
 
   @override
   Widget build(BuildContext context) {
     final c = Theme.of(context).extension<AppColors>()!;
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+    final tier = _tier;
+
+    return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: c.surface,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: tier.gradientColors(c),
+        ),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: c.border),
+        border: Border.all(
+          color: tier.accentColor(c).withValues(alpha: 0.35),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: tier.accentColor(c).withValues(alpha: 0.1),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
-            width: 46,
-            height: 46,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: c.primary.withValues(alpha: 0.15),
+              color: tier.accentColor(c).withValues(alpha: 0.15),
               shape: BoxShape.circle,
+              border: Border.all(
+                  color: tier.accentColor(c).withValues(alpha: 0.3)),
             ),
-            child: Icon(Icons.star_rounded, color: c.primary, size: 22),
+            child: Icon(tier.icon, color: tier.accentColor(c), size: 26),
           ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  _title,
-                  style: GoogleFonts.inter(
-                    color: c.textPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      tier.title,
+                      style: GoogleFonts.inter(
+                        color: c.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: tier.accentColor(c).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: tier.accentColor(c).withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        tier.badge,
+                        style: GoogleFonts.inter(
+                          color: tier.accentColor(c),
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
-                  _subtitle,
+                  tier.subtitle(bestStreak),
                   style: GoogleFonts.inter(
-                    color: c.primary,
+                    color: c.textSecondary,
                     fontSize: 11,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -77,5 +111,99 @@ class AchievementCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+enum _AchievementTier {
+  quantumMaster,
+  bosonHunter,
+  sharpMind,
+  fieldExplorer,
+  curiousLearner,
+}
+
+extension _TierProps on _AchievementTier {
+  String get title {
+    switch (this) {
+      case _AchievementTier.quantumMaster:
+        return 'Quantum Master';
+      case _AchievementTier.bosonHunter:
+        return 'Boson Hunter';
+      case _AchievementTier.sharpMind:
+        return 'Sharp Mind';
+      case _AchievementTier.fieldExplorer:
+        return 'Field Explorer';
+      case _AchievementTier.curiousLearner:
+        return 'Curious Learner';
+    }
+  }
+
+  String get badge {
+    switch (this) {
+      case _AchievementTier.quantumMaster:
+        return 'ELITE';
+      case _AchievementTier.bosonHunter:
+        return 'ADVANCED';
+      case _AchievementTier.sharpMind:
+        return 'PROFICIENT';
+      case _AchievementTier.fieldExplorer:
+        return 'EXPLORER';
+      case _AchievementTier.curiousLearner:
+        return 'BEGINNER';
+    }
+  }
+
+  String subtitle(int streak) {
+    switch (this) {
+      case _AchievementTier.quantumMaster:
+        return 'Reached 10-streak perfection. Maximum resonance.';
+      case _AchievementTier.bosonHunter:
+        return 'Identified $streak particles in a row. Impressive!';
+      case _AchievementTier.sharpMind:
+        return '90%+ accuracy maintained. Exceptional precision.';
+      case _AchievementTier.fieldExplorer:
+        return 'Solid grasp of the field. Keep pushing.';
+      case _AchievementTier.curiousLearner:
+        return 'Every question brings you closer to mastery.';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case _AchievementTier.quantumMaster:
+        return Icons.auto_awesome_rounded;
+      case _AchievementTier.bosonHunter:
+        return Icons.bolt_rounded;
+      case _AchievementTier.sharpMind:
+        return Icons.psychology_rounded;
+      case _AchievementTier.fieldExplorer:
+        return Icons.explore_rounded;
+      case _AchievementTier.curiousLearner:
+        return Icons.school_rounded;
+    }
+  }
+
+  Color accentColor(AppColors c) {
+    switch (this) {
+      case _AchievementTier.quantumMaster:
+        return c.primary;
+      case _AchievementTier.bosonHunter:
+        return c.tealLight;
+      case _AchievementTier.sharpMind:
+        return c.greenMid;
+      case _AchievementTier.fieldExplorer:
+        return c.primary;
+      case _AchievementTier.curiousLearner:
+        return c.textSecondary;
+    }
+  }
+
+  List<Color> gradientColors(AppColors c) {
+    final accent = accentColor(c);
+    return [
+      accent.withValues(alpha: 0.1),
+      c.surface,
+      c.cardDark,
+    ];
   }
 }
