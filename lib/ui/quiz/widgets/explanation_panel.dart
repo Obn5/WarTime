@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../app/app_theme.dart';
+import '../../../core/theme.dart';
 
 class ExplanationPanel extends StatelessWidget {
   final bool isCorrect;

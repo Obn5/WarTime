@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../../app/app_theme.dart';
-import '../../../app/constants.dart';
-import '../../../models/topic.dart';
+import '../../../core/theme.dart';
+import '../../../core/constants.dart';
+import '../../../data/models/topic.dart';
 import 'tag_chip.dart';
 
 class StreakBar extends StatelessWidget {

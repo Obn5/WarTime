@@ -1,9 +1,9 @@
-import 'dart:math';
+﻿import 'dart:math';
 import 'package:flutter/foundation.dart';
-import '../app/constants.dart';
-import '../models/question.dart';
-import '../models/quiz_set.dart';
-import '../models/topic.dart';
+import '../core/constants.dart';
+import '../data/models/question.dart';
+import '../data/models/quiz_set.dart';
+import '../data/models/topic.dart';
 
 enum QuizPhase { idle, answering, revealing, quintetStats, complete }
 

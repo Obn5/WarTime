@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/quiz_provider.dart';
-import '../features/home/home_screen.dart';
-import 'app_theme.dart';
+import '../state/quiz_provider.dart';
+import '../ui/home/home_screen.dart';
+import 'theme.dart';
 import 'constants.dart';
 
 class LearnLoopApp extends StatelessWidget {

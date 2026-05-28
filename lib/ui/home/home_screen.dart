@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../app/app_theme.dart';
-import '../../app/constants.dart';
-import '../../providers/quiz_provider.dart';
-import '../../services/json_service.dart';
+import '../../core/theme.dart';
+import '../../core/constants.dart';
+import '../../state/quiz_provider.dart';
+import '../../data/services/json_service.dart';
 import '../quiz/quiz_screen.dart';
 import '../stats/stats_screen.dart';
 import 'widgets/import_card.dart';

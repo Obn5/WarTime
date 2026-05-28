@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../app/app_theme.dart';
-import '../../app/constants.dart';
-import '../../providers/quiz_provider.dart';
+import '../../core/theme.dart';
+import '../../core/constants.dart';
+import '../../state/quiz_provider.dart';
 import 'widgets/achievement_card.dart';
 import 'widgets/stat_card.dart';
 
